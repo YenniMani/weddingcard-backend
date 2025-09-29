@@ -12,7 +12,7 @@ const { client_secret, client_id } = CREDENTIALS.installed
 const oAuth2Client = new google.auth.OAuth2(
   client_id,
   client_secret,
-  "http://localhost:3000/oauth2callback"
+  "https://weddingcard-backend-izdvs0jc4-manis-projects-7b2dc0b8.vercel.app/oauth2callback"
 );
 
 const app = express();
