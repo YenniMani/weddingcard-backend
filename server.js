@@ -1,11 +1,15 @@
 const express = require("express");
 const multer = require("multer");
 const { google } = require("googleapis");
+const { Readable } = require("stream");
 const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
+
+// Use memory storage instead of disk
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // Load Desktop credentials
 const credentialsPath = path.join(__dirname,"desktop-credentials.json");
@@ -28,26 +32,33 @@ const drive = google.drive({ version: "v3", auth: oAuth2Client });
 // Upload API
 app.post("/photos-upload", upload.single("photo"), async (req, res) => {
   try {
-    const filePath = req.file.path;
+    const file = req.file;
 
-    const fileMetadata = { name: req.file.originalname };
+    if (!file) {
+      return res.status(400).json({ success: false, error: "No file uploaded" });
+    }
+
+    // Create a readable stream from buffer
+    const bufferStream = new Readable();
+    bufferStream.push(file.buffer);
+    bufferStream.push(null);
+
+    const fileMetadata = { name: file.originalname };
     const media = {
-      mimeType: req.file.mimetype,
-      body: fs.createReadStream(filePath),
+      mimeType: file.mimetype,
+      body: bufferStream,
     };
 
-    const file = await drive.files.create({
+    const uploadedFile = await drive.files.create({
       resource: fileMetadata,
       media,
       fields: "id, webViewLink",
     });
 
-    fs.unlinkSync(filePath);
-
-    res.json({ success: true, fileUrl: file.data.webViewLink });
+    res.json({ success: true, fileUrl: uploadedFile.data.webViewLink });
   } catch (err) {
     console.error(err);
-    res.json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
