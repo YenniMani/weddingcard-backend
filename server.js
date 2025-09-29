@@ -75,54 +75,6 @@ app.post("/photos-upload", upload.single("photo"), async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
-
-// 🔹 RSVP save API
-const RSVP_FILE = path.join(__dirname, "rsvp.json");
-
-app.post("/save-rsvp", (req, res) => {
-  try {
-    const { photoUrl, guestName, attending } = req.body;
-    if (!photoUrl || !guestName) {
-      return res
-        .status(400)
-        .json({ success: false, error: "photoUrl and guestName required" });
-    }
-
-    let rsvps = [];
-    if (fs.existsSync(RSVP_FILE)) {
-      const existing = fs.readFileSync(RSVP_FILE, "utf8");
-      rsvps = existing ? JSON.parse(existing) : [];
-    }
-
-    const newEntry = {
-      id: Date.now(),
-      guestName,
-      attending,
-      photoUrl,
-    };
-
-    rsvps.push(newEntry);
-    fs.writeFileSync(RSVP_FILE, JSON.stringify(rsvps, null, 2));
-
-    res.json({ success: true, entry: newEntry });
-  } catch (err) {
-    console.error("RSVP save error:", err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// 🔹 Fetch all RSVPs (optional admin use)
-app.get("/rsvps", (req, res) => {
-  try {
-    if (!fs.existsSync(RSVP_FILE)) return res.json([]);
-    const rsvps = JSON.parse(fs.readFileSync(RSVP_FILE, "utf8"));
-    res.json(rsvps);
-  } catch (err) {
-    console.error("RSVP fetch error:", err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
 app.listen(5000, () => {
   console.log("🚀 Server running on http://localhost:5000");
 });
