@@ -4,8 +4,12 @@ const { google } = require("googleapis");
 const { Readable } = require("stream");
 const fs = require("fs");
 const path = require("path");
+const cors = require("cors"); // <-- import cors
 
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
 
 // Use memory storage instead of disk
 const storage = multer.memoryStorage();
