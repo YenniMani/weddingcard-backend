@@ -33,7 +33,7 @@ oAuth2Client.setCredentials(JSON.parse(fs.readFileSync(TOKEN_PATH)));
 const drive = google.drive({ version: "v3", auth: oAuth2Client });
 
 // 🔹 Folder ID for uploads (create in Google Drive manually, copy its ID)
-const DRIVE_FOLDER_ID = "marraigeAttendancePhotos"; // <--- replace with your folder ID
+const DRIVE_FOLDER_ID = "17Dwf4UQi8kvYUBkG_j-AJkhuUnb6u6SV"; // <--- replace with your folder ID
 
 // Upload API
 app.post("/photos-upload", upload.single("photo"), async (req, res) => {
