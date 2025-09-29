@@ -8,7 +8,8 @@ const app = express();
 const upload = multer({ dest: "uploads/" });
 
 // Load Desktop credentials
-const credentials = JSON.parse(fs.readFileSync("weddingcard-backend/desktop-credentials.json"));
+const credentialsPath = path.join(__dirname,"desktop-credentials.json");
+const credentials = JSON.parse(fs.readFileSync(credentialsPath, "utf8"));
 const { client_secret, client_id, redirect_uris } = credentials.installed;
 
 // OAuth2 client
